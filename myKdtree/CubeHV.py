@@ -1,6 +1,7 @@
 import Point3D
 import math
 
+
 class CubeHV:
     xmax = 0
     xmin = 0
@@ -18,12 +19,9 @@ class CubeHV:
         self.zmax = z2
 
     def contains(self, point):
-        if self.xmin <= point.x and \
-            self.xmax >= point.x and \
-            self.ymin <= point.y and \
-            self.ymax >= point.y and \
-            self.zmin <= point.z and \
-            self.zmax >= point.z:
+        if self.xmin <= point.x and self.xmax >= point.x and \
+                self.ymin <= point.y and self.ymax >= point.y and \
+                self.zmin <= point.z and self.zmax >= point.z:
             return True
         else:
             return False

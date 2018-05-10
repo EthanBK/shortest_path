@@ -1,18 +1,11 @@
 import numpy as np
 import scipy.spatial as spatial
 from laspy.file import File
-import progressbar
 import timeit
 import itertools
 
 # Minimum distance
 min_dis = 1
-
-bar = progressbar.ProgressBar(widgets=[
-    ' [', progressbar.Timer(), '] ',
-    progressbar.Bar(),
-    ' (', progressbar.ETA(), ') ',
-])
 
 stats = open('../data/stats.csv', 'w')
 header = "id,mini_dis,len_input,len_output,Reduction_rate,time" + '\n'
