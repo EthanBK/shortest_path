@@ -6,6 +6,7 @@ class Node:
     x = 0
     y = 0
     z = 0
+    shortest_dis = None
     neighbors = None
 
     def __init__(self, x, y, z):
@@ -14,12 +15,23 @@ class Node:
         self.z = z
 
 
+class Edge:
+    startNode = None
+    endNode = None
+    weight = 0
+
+    def __init__(self, m, n, w):
+        self.startNode = m
+        self.endNode = n
+        self.weight = w
+
+
 inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
 
 # find the boundary of the site;
-boundary  = np.array([inFile.header.min.x, inFile.header.min.y, inFile.header.min.z],
-                     [inFile.header.max.x, inFile.header.max.y, inFile.header.max.z])
+boundary = np.array([inFile.header.min.x, inFile.header.min.y, inFile.header.min.z],
+                    [inFile.header.max.x, inFile.header.max.y, inFile.header.max.z])
 
 # set the closest distance to obstacles
 c_dis = 2
