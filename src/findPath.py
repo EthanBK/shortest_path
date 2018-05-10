@@ -1,6 +1,7 @@
 from laspy.file import File
 import numpy as np
 
+
 class Node:
     x = 0
     y = 0
@@ -11,6 +12,7 @@ class Node:
         self.x = x
         self.y = y
         self.z = z
+
 
 inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))

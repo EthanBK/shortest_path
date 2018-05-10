@@ -4,6 +4,7 @@ import numpy as np
 from laspy.file import File
 import math
 
+
 class VtkPointCloud:
 
     def __init__(self, zMin=-100.0, zMax=100.0, maxNumPoints=1e6):
@@ -40,6 +41,7 @@ class VtkPointCloud:
         self.vtkPolyData.SetVerts(self.vtkCells)
         self.vtkPolyData.GetPointData().SetScalars(self.vtkDepth)
         self.vtkPolyData.GetPointData().SetActiveScalars('DepthArray')
+
 
 inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
