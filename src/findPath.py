@@ -41,23 +41,38 @@ point_tree = spatial.KDTree(points)
 boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.min[1]), math.ceil(inFile.header.min[2])],
                     [math.floor(inFile.header.max[0]), math.floor(inFile.header.max[1]), math.floor(inFile.header.max[2])]])
 
-print(boundary)
+print("boundary: ", boundary)
+print("boundary_size: ", boundary[1][0] - boundary[0][0], " x ",
+      boundary[1][1] - boundary[0][1], " x ", boundary[1][2] - boundary[0][2])
 
 # set the closest distance to obstacles
-c_dis = 2
+c_dis = 5
 
 # create a List to store nodes
 nodes = [[[None for i in range(boundary[0, 0], boundary[1, 0])]
           for j in range(boundary[0, 1], boundary[1, 1])]
          for k in range(boundary[0, 2], boundary[1, 2])]
+node_count = 0
+
 
 for i in range(boundary[0, 0], boundary[1, 0], c_dis):
     for j in range(boundary[0, 1], boundary[1, 1], c_dis):
         for k in range(boundary[0, 2], boundary[1, 2], c_dis):
             near_point = point_tree.query_ball_point([i, j, k], c_dis)
             # if obstacle within c_dis, do not create node
+
             if len(near_point) != 0:
                 continue
+
+            try:
+                nodes[i - boundary[0, 0]][j - boundary[0, 1]][k - boundary[0, 2]] = math.inf
+            except IndexError:
+                print("IndexError", i - boundary[0, 0], j - boundary[0, 1], k - boundary[0, 2])
+            node_count += 1
+
+print(node_count)
+
+
 
 
 
