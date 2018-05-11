@@ -6,27 +6,25 @@ import pprint
 
 
 class Node:
-    x = 0
-    y = 0
-    z = 0
-    shortest_dis = None
-    neighbors = None
-
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
+        self.neighbor = []
+        self.shortest_dis = math.inf
+        self.visited = False
+        self.velocity_victor = None
+
+    def coord(self):
+        return [self.x, self.y, self.z]
 
 
 class Edge:
-    startNode = None
-    endNode = None
-    weight = 0
-
-    def __init__(self, m, n, w):
-        self.startNode = m
-        self.endNode = n
+    def __init__(self, f, t, w):
+        self.fromN = f
+        self.endN = t
         self.weight = w
+        self.direction = None
 
 
 inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
@@ -42,33 +40,62 @@ boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.m
                     [math.floor(inFile.header.max[0]), math.floor(inFile.header.max[1]), math.floor(inFile.header.max[2])]])
 
 print("boundary: ", boundary)
-print("boundary_size: ", boundary[1][0] - boundary[0][0], " x ",
-      boundary[1][1] - boundary[0][1], " x ", boundary[1][2] - boundary[0][2])
+# Define parameters
+c_dis = 5               # The closest distance to obstacles / the distance of nodes
+weight_up = 2           # penalty to go up
+weight_down = -1        # penalty to go down
+weight_sharp_turn = 2   # penalty to take shape turn
 
-# set the closest distance to obstacles
-c_dis = 5
 
 # create a List to store nodes
-nodes = [[[None for i in range(boundary[0, 0], boundary[1, 0])]
-          for j in range(boundary[0, 1], boundary[1, 1])]
-         for k in range(boundary[0, 2], boundary[1, 2])]
-node_count = 0
+nodes_list = [[[None for i in range(boundary[0, 2], boundary[1, 2], c_dis)]
+               for j in range(boundary[0, 1], boundary[1, 1], c_dis)]
+              for k in range(boundary[0, 0], boundary[1, 0], c_dis)]
+print("nodes_size: ", len(nodes_list), " x ", len(nodes_list[0]), " x ", len(nodes_list[0][0]))
 
+node_count = 0
 
 for i in range(boundary[0, 0], boundary[1, 0], c_dis):
     for j in range(boundary[0, 1], boundary[1, 1], c_dis):
         for k in range(boundary[0, 2], boundary[1, 2], c_dis):
             near_point = point_tree.query_ball_point([i, j, k], c_dis)
             # if obstacle within c_dis, do not create node
-
             if len(near_point) != 0:
                 continue
 
-            try:
-                nodes[i - boundary[0, 0]][j - boundary[0, 1]][k - boundary[0, 2]] = math.inf
-            except IndexError:
-                print("IndexError", i - boundary[0, 0], j - boundary[0, 1], k - boundary[0, 2])
+            newNode = Node(i, j, k)
+            newNode_index = [int((i - boundary[0, 0]) / c_dis),
+                             int((j - boundary[0, 1]) / c_dis),
+                             int((k - boundary[0, 2]) / c_dis)]
+            # print("new node", newNode.coord())
+            # Add neighbors
+            for p in range(-1, 2):
+                for q in range(-1, 2):
+                    for r in range(-1, 2):
+                        if p == 0 and q == 0 and r == 0:
+                            continue
+                        nei_index = [newNode_index[0] + p,
+                                     newNode_index[1] + q,
+                                     newNode_index[2] + r]
+                        if 0 <= nei_index[0] < len(nodes_list) and \
+                                0 <= nei_index[1] < len(nodes_list[0]) and \
+                                0 <= nei_index[2] < len(nodes_list[0][0]) and \
+                                nodes_list[nei_index[0]][nei_index[1]][nei_index[2]] is not None:
+                                # Calculate edge weight, right now only Euclidean distance
+                                weight = math.sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2)) * c_dis
+                                # print(nodes_list[nei_index[0]][nei_index[1]][nei_index[2]].coord(), weight)
+                                newNode.neighbor.append([nodes_list[nei_index[0]][nei_index[1]][nei_index[2]], weight])
+            nodes_list[newNode_index[0]][newNode_index[1]][newNode_index[2]] = newNode
             node_count += 1
+
+# Set start point, range: x:0~402, y:0~700, z:0~61
+point_start = [0, 0, 0]
+
+# Find closest node on nodes to point_start with binary search
+
+
+# calculate shortest  distance from source
+
 
 print(node_count)
 
