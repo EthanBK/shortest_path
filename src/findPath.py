@@ -3,6 +3,30 @@ import numpy as np
 import scipy.spatial as spatial
 import math
 import pprint
+import random
+from queue import PriorityQueue
+
+
+class MyPriorityQueue(PriorityQueue):
+    def __init__(self):
+        PriorityQueue.__init__(self)
+        self.counter = 0
+
+    def put(self, item, priority):
+        PriorityQueue.put(self, (priority, self.counter, item))
+        self.counter += 1
+
+    def get(self, *args, **kwargs):
+        _, _, item = PriorityQueue.get(self, *args, **kwargs)
+        self.counter -= 1
+        return item
+
+
+q = MyPriorityQueue()
+q.put("itme1", 1)
+q.put("itme2", 2)
+q.put("itme5", 5)
+q.put("itme4", 4)
 
 
 class Node:
@@ -11,9 +35,10 @@ class Node:
         self.y = y
         self.z = z
         self.neighbor = []
-        self.shortest_dis = math.inf
+        self.dist = math.inf
         self.visited = False
         self.velocity_victor = None
+        self.pre = None
 
     def coord(self):
         return [self.x, self.y, self.z]
@@ -54,6 +79,7 @@ nodes_list = [[[None for i in range(boundary[0, 2], boundary[1, 2], c_dis)]
 print("nodes_size: ", len(nodes_list), " x ", len(nodes_list[0]), " x ", len(nodes_list[0][0]))
 
 node_count = 0
+unvisited = MyPriorityQueue()
 
 for i in range(boundary[0, 0], boundary[1, 0], c_dis):
     for j in range(boundary[0, 1], boundary[1, 1], c_dis):
@@ -84,18 +110,25 @@ for i in range(boundary[0, 0], boundary[1, 0], c_dis):
                                 # Calculate edge weight, right now only Euclidean distance
                                 weight = math.sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2)) * c_dis
                                 # print(nodes_list[nei_index[0]][nei_index[1]][nei_index[2]].coord(), weight)
-                                newNode.neighbor.append([nodes_list[nei_index[0]][nei_index[1]][nei_index[2]], weight])
+                                newNode.neighbor.append([[nei_index[0], nei_index[1], nei_index[2]], weight])
             nodes_list[newNode_index[0]][newNode_index[1]][newNode_index[2]] = newNode
+            unvisited.put(newNode_index, newNode.dist)
             node_count += 1
 
 # Set start point, range: x:0~402, y:0~700, z:0~61
-point_start = [0, 0, 0]
-
-# Find closest node on nodes to point_start with binary search
-
+sourceNode = None
+while sourceNode is None:
+    x = random.random() * len(nodes_list)
+    y = random.random() * len(nodes_list[0])
+    z = random.random() * len(nodes_list[0][0])
+    sourceNode = nodes_list[x][y][z]
 
 # calculate shortest  distance from source
-
+# while not unvisited.empty():
+#     u = unvisited.get()
+#     for i in range(len(u.neighbor)):
+#         nei = u.neighbor[i]
+#         alt = u.dist + nei[1]
 
 print(node_count)
 
