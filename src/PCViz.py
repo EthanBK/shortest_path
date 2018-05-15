@@ -43,7 +43,7 @@ class VtkPointCloud:
         self.vtkPolyData.GetPointData().SetActiveScalars('DepthArray')
 
 
-inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
+inFile = File('../filtered_points/filtered_points_1.25.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
 
 for i in range(3):

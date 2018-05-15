@@ -5,6 +5,7 @@ import math
 import pprint
 import random
 from queue import PriorityQueue
+import sys
 
 
 class MyPriorityQueue(PriorityQueue):
@@ -22,11 +23,11 @@ class MyPriorityQueue(PriorityQueue):
         return item
 
 
-q = MyPriorityQueue()
-q.put("itme1", 1)
-q.put("itme2", 2)
-q.put("itme5", 5)
-q.put("itme4", 4)
+def cvt_coord(index_list, dimension):
+    res = index_list[0]
+    res += index_list[1] * dimension[0]
+    res += index_list[2] * dimension[0] * dimension[1]
+    return res
 
 
 class Node:
@@ -52,7 +53,7 @@ class Edge:
         self.direction = None
 
 
-inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
+inFile = File('../filtered_points/filtered_points_2.5.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
 
 # Put all points into a KdTree
@@ -66,7 +67,7 @@ boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.m
 
 print("boundary: ", boundary)
 # Define parameters
-c_dis = 5               # The closest distance to obstacles / the distance of nodes
+c_dis = 10               # The closest distance to obstacles / the distance of nodes
 weight_up = 2           # penalty to go up
 weight_down = -1        # penalty to go down
 weight_sharp_turn = 2   # penalty to take shape turn
@@ -76,10 +77,13 @@ weight_sharp_turn = 2   # penalty to take shape turn
 nodes_list = [[[None for i in range(boundary[0, 2], boundary[1, 2], c_dis)]
                for j in range(boundary[0, 1], boundary[1, 1], c_dis)]
               for k in range(boundary[0, 0], boundary[1, 0], c_dis)]
-print("nodes_size: ", len(nodes_list), " x ", len(nodes_list[0]), " x ", len(nodes_list[0][0]))
+dimension = [len(nodes_list), len(nodes_list[0]), len(nodes_list[0][0])]
+print("dimension: ", dimension)
 
 node_count = 0
-unvisited = MyPriorityQueue()
+distances = {}
+visited = {}
+unvisited = {}  # Create a dictionary
 
 for i in range(boundary[0, 0], boundary[1, 0], c_dis):
     for j in range(boundary[0, 1], boundary[1, 1], c_dis):
@@ -93,44 +97,89 @@ for i in range(boundary[0, 0], boundary[1, 0], c_dis):
             newNode_index = [int((i - boundary[0, 0]) / c_dis),
                              int((j - boundary[0, 1]) / c_dis),
                              int((k - boundary[0, 2]) / c_dis)]
-            # print("new node", newNode.coord())
+            newNode_index_linear = cvt_coord(newNode_index, dimension)
+            distances[newNode_index_linear] = {}
+            # print("New Node", newNode_index_linear)
+
             # Add neighbors
             for p in range(-1, 2):
                 for q in range(-1, 2):
                     for r in range(-1, 2):
                         if p == 0 and q == 0 and r == 0:
                             continue
+                            # create a list to store new index
                         nei_index = [newNode_index[0] + p,
                                      newNode_index[1] + q,
                                      newNode_index[2] + r]
-                        if 0 <= nei_index[0] < len(nodes_list) and \
-                                0 <= nei_index[1] < len(nodes_list[0]) and \
-                                0 <= nei_index[2] < len(nodes_list[0][0]) and \
+                        if 0 <= nei_index[0] < dimension[0] and \
+                                0 <= nei_index[1] < dimension[1] and \
+                                0 <= nei_index[2] < dimension[2] and \
                                 nodes_list[nei_index[0]][nei_index[1]][nei_index[2]] is not None:
+
                                 # Calculate edge weight, right now only Euclidean distance
                                 weight = math.sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2)) * c_dis
-                                # print(nodes_list[nei_index[0]][nei_index[1]][nei_index[2]].coord(), weight)
-                                newNode.neighbor.append([[nei_index[0], nei_index[1], nei_index[2]], weight])
+                                nei_index_linear = cvt_coord(nei_index, dimension)
+                                distances[newNode_index_linear][nei_index_linear] = weight
+                                # print("neighbor", nei_index_linear, weight)
+                                # newNode.neighbor.append([nei_index_linear, weight])
             nodes_list[newNode_index[0]][newNode_index[1]][newNode_index[2]] = newNode
-            unvisited.put(newNode_index, newNode.dist)
+            unvisited[newNode_index_linear] = None
             node_count += 1
+print("node count", node_count)
 
 # Set start point, range: x:0~402, y:0~700, z:0~61
 sourceNode = None
+x, y, z = 0, 0, 0
 while sourceNode is None:
-    x = random.random() * len(nodes_list)
-    y = random.random() * len(nodes_list[0])
-    z = random.random() * len(nodes_list[0][0])
+    x = int(random.random() * len(nodes_list))
+    y = int(random.random() * len(nodes_list[0]))
+    z = int(random.random() * len(nodes_list[0][0]))
     sourceNode = nodes_list[x][y][z]
+sourceIndex = cvt_coord([x, y, z], dimension)
+endNode = None
+while endNode is None:
+    x = int(random.random() * len(nodes_list))
+    y = int(random.random() * len(nodes_list[0]))
+    z = int(random.random() * len(nodes_list[0][0]))
+    endNode = nodes_list[x][y][z]
+endIndex = cvt_coord([x, y, z], dimension)
 
-# calculate shortest  distance from source
-# while not unvisited.empty():
-#     u = unvisited.get()
-#     for i in range(len(u.neighbor)):
-#         nei = u.neighbor[i]
-#         alt = u.dist + nei[1]
+# error record
+sourceIndex = 12407
+endIndex = 12993
+print("sourceIndex", sourceIndex)
+print("endIndex", endIndex)
 
-print(node_count)
+currentIndex = sourceIndex
+currentWei = 0
+unvisited[currentIndex] = currentWei
+
+while True:
+    for neighbor, weight in distances[currentIndex].items():
+        if neighbor not in unvisited:
+            continue
+        newWeight = currentWei + weight
+        if unvisited[neighbor] is None or unvisited[neighbor] > newWeight:
+            unvisited[neighbor] = newWeight
+    visited[currentIndex] = currentWei
+    if currentIndex == endIndex:
+        print("Short Path from Start to End is: ", currentWei)
+        sys.exit("error message")
+    del unvisited[currentIndex]
+    if not unvisited:
+        break
+
+    try:
+        candidates = [node for node in unvisited.items() if node[1]]
+        currentIndex, currentWei = sorted(candidates, key=lambda x: x[1])[0]
+    except IndexError:
+        print("IndexError!")
+        print("unvisited", unvisited[currentIndex])
+        print('candidates', candidates)
+
+print(visited[endIndex])
+
+
 
 
 
