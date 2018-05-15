@@ -36,7 +36,8 @@ def print_path(endIndex):
     while prev is not None:
         path.append(prev)
         prev = fromNode[prev]
-    print("path index: ", path.reverse())
+    path.reverse()
+    print("path index: ", path)
 
 
 class Node:
@@ -76,7 +77,7 @@ boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.m
 
 print("boundary: ", boundary)
 # Define parameters
-c_dis = 10               # The closest distance to obstacles / the distance of nodes
+c_dis = 20               # The closest distance to obstacles / the distance of nodes
 weight_up = 2           # penalty to go up
 weight_down = -1        # penalty to go down
 weight_sharp_turn = 2   # penalty to take shape turn
@@ -93,6 +94,7 @@ node_count = 0
 distances = {}
 visited = {}
 unvisited = {}  # Create a dictionary
+fromNode = {}
 
 for i in range(boundary[0, 0], boundary[1, 0], c_dis):
     for j in range(boundary[0, 1], boundary[1, 1], c_dis):
@@ -133,6 +135,7 @@ for i in range(boundary[0, 0], boundary[1, 0], c_dis):
                                 # newNode.neighbor.append([nei_index_linear, weight])
             nodes_list[newNode_index[0]][newNode_index[1]][newNode_index[2]] = newNode
             unvisited[newNode_index_linear] = None
+            fromNode[newNode_index_linear] = None
             node_count += 1
 print("node count", node_count)
 
@@ -154,17 +157,16 @@ while endNode is None:
 endIndex = cvt_coord([x, y, z], dimension)
 
 # error record
-# sourceIndex = 9798
-# 9798
-# endIndex = 202
-# 2029
+# success = [1581, 1493]
+sourceIndex = 1581
+endIndex = 1493
 print("sourceIndex", sourceIndex)
 print("endIndex", endIndex)
 
 currentIndex = sourceIndex
 currentWei = 0
 unvisited[currentIndex] = currentWei
-fromNode = {}
+
 
 while True:
     for neighbor, weight in distances[currentIndex].items():
@@ -178,18 +180,16 @@ while True:
     if currentIndex == endIndex:
         print("Short Path from Start to End is: ", currentWei)
         print_path(currentIndex)
-        sys.exit("error message")
+        sys.exit("Path found!")
     del unvisited[currentIndex]
     if not unvisited:
         break
 
-    try:
-        candidates = [node for node in unvisited.items() if node[1]]
-        currentIndex, currentWei = sorted(candidates, key=lambda x: x[1])[0]
-    except IndexError:
-        print("IndexError!")
-        print("unvisited", unvisited)
-        print('candidates', candidates)
+    candidates = [node for node in unvisited.items() if node[1]]
+    if not candidates:
+        sys.exit("No Path!")
+    currentIndex, currentWei = sorted(candidates, key=lambda x: x[1])[0]
+
 
 print(visited[endIndex])
 print_path(endIndex)
