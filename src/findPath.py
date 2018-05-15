@@ -30,6 +30,15 @@ def cvt_coord(index_list, dimension):
     return res
 
 
+def print_path(endIndex):
+    prev = endIndex
+    path = []
+    while prev is not None:
+        path.append(prev)
+        prev = fromNode[prev]
+    print("path index: ", path.reverse())
+
+
 class Node:
     def __init__(self, x, y, z):
         self.x = x
@@ -145,14 +154,17 @@ while endNode is None:
 endIndex = cvt_coord([x, y, z], dimension)
 
 # error record
-sourceIndex = 12407
-endIndex = 12993
+# sourceIndex = 9798
+# 9798
+# endIndex = 202
+# 2029
 print("sourceIndex", sourceIndex)
 print("endIndex", endIndex)
 
 currentIndex = sourceIndex
 currentWei = 0
 unvisited[currentIndex] = currentWei
+fromNode = {}
 
 while True:
     for neighbor, weight in distances[currentIndex].items():
@@ -161,9 +173,11 @@ while True:
         newWeight = currentWei + weight
         if unvisited[neighbor] is None or unvisited[neighbor] > newWeight:
             unvisited[neighbor] = newWeight
+            fromNode[neighbor] = currentIndex
     visited[currentIndex] = currentWei
     if currentIndex == endIndex:
         print("Short Path from Start to End is: ", currentWei)
+        print_path(currentIndex)
         sys.exit("error message")
     del unvisited[currentIndex]
     if not unvisited:
@@ -174,10 +188,14 @@ while True:
         currentIndex, currentWei = sorted(candidates, key=lambda x: x[1])[0]
     except IndexError:
         print("IndexError!")
-        print("unvisited", unvisited[currentIndex])
+        print("unvisited", unvisited)
         print('candidates', candidates)
 
 print(visited[endIndex])
+print_path(endIndex)
+
+
+
 
 
 
