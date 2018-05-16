@@ -3,6 +3,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def cvt_coord_to_cube(index):
     res = []
     res.append(index // (dimension[0] * dimension[1]))
