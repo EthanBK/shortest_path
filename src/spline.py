@@ -1,4 +1,7 @@
-
+import matplotlib as mpl
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+import matplotlib.pyplot as plt
 
 def cvt_coord_to_cube(index):
     res = []
@@ -26,8 +29,21 @@ print("path ", path)
 with open('../data/dimension.txt', 'r') as fp:
     dimension = fp.read().split(',')
 del dimension[-1]
-dimension = list(map(int, path))
+dimension = list(map(int, dimension))
 print("dimension ", dimension)
 
-print(cvt_coord_to_line([22, 33, 1]))
-print(cvt_coord_to_cube(2516974))
+#  convert index to xyz coordinate
+x, y, z = [], [], []
+for item in path:
+    coord = cvt_coord_to_cube(item)
+    x.append(coord[0])
+    y.append(coord[1])
+    z.append(coord[2])
+print(x, y, z)
+
+# plot in 3d space
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot(x, y, z)
+plt.show()
+
