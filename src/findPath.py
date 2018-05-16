@@ -6,6 +6,7 @@ import pprint
 import random
 from queue import PriorityQueue
 import sys
+import json
 
 
 class MyPriorityQueue(PriorityQueue):
@@ -38,6 +39,9 @@ def print_path(endIndex):
         prev = fromNode[prev]
     path.reverse()
     print("path index: ", path)
+    with open('../data/path.txt', 'w') as fp:
+        for item in path:
+            fp.write("%s," % item)
 
 
 class Node:
@@ -88,6 +92,9 @@ nodes_list = [[[None for i in range(boundary[0, 2], boundary[1, 2], c_dis)]
                for j in range(boundary[0, 1], boundary[1, 1], c_dis)]
               for k in range(boundary[0, 0], boundary[1, 0], c_dis)]
 dimension = [len(nodes_list), len(nodes_list[0]), len(nodes_list[0][0])]
+with open('../data/dimension.txt', 'w') as fp:
+    for item in dimension:
+        fp.write('%s,' % item)
 print("dimension: ", dimension)
 
 node_count = 0
