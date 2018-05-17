@@ -67,7 +67,7 @@ class Edge:
         self.direction = None
 
 
-inFile = File('../filtered_points/filtered_points_2.5.las', mode='r')
+inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
 points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
 
 # Put all points into a KdTree
@@ -81,7 +81,7 @@ boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.m
 
 print("boundary: ", boundary)
 # Define parameters
-c_dis = 20               # The closest distance to obstacles / the distance of nodes
+c_dis = 5               # The closest distance to obstacles / the distance of nodes
 weight_up = 2           # penalty to go up
 weight_down = -1        # penalty to go down
 weight_sharp_turn = 2   # penalty to take shape turn
