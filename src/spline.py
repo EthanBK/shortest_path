@@ -4,6 +4,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def cvt_coord_to_line(index_list, dimension):
+    res = index_list[0]
+    res += index_list[1] * dimension[0]
+    res += index_list[2] * dimension[0] * dimension[1]
+    return res
+
+
 def cvt_coord_to_cube(index):
     res = []
     res.append(index // (dimension[0] * dimension[1]))
@@ -12,13 +19,6 @@ def cvt_coord_to_cube(index):
     index -= res[1] * dimension[0]
     res.append(index)
     res.reverse()
-    return res
-
-
-def cvt_coord_to_line(index_list):
-    res = index_list[0]
-    res += index_list[1] * dimension[0]
-    res += index_list[2] * dimension[0] * dimension[1]
     return res
 
 
@@ -40,7 +40,9 @@ for item in path:
     x.append(coord[0])
     y.append(coord[1])
     z.append(coord[2])
-print(x, y, z)
+print(x)
+print(y)
+print(z)
 
 # plot in 3d space
 fig = plt.figure()

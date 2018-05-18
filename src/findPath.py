@@ -2,11 +2,9 @@ from laspy.file import File
 import numpy as np
 import scipy.spatial as spatial
 import math
-import pprint
 import random
 from queue import PriorityQueue
 import sys
-import json
 
 
 class MyPriorityQueue(PriorityQueue):
@@ -24,10 +22,21 @@ class MyPriorityQueue(PriorityQueue):
         return item
 
 
-def cvt_coord(index_list, dimension):
+def cvt_coord_to_line(index_list, dimension):
     res = index_list[0]
     res += index_list[1] * dimension[0]
     res += index_list[2] * dimension[0] * dimension[1]
+    return res
+
+
+def cvt_coord_to_cube(index):
+    res = []
+    res.append(index // (dimension[0] * dimension[1]))
+    index -= res[0] * dimension[0] * dimension[1]
+    res.append(index // dimension[0])
+    index -= res[1] * dimension[0]
+    res.append(index)
+    res.reverse()
     return res
 
 
@@ -81,7 +90,7 @@ boundary = np.array([[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.m
 
 print("boundary: ", boundary)
 # Define parameters
-c_dis = 5               # The closest distance to obstacles / the distance of nodes
+c_dis = 10               # The closest distance to obstacles / the distance of nodes
 weight_up = 2           # penalty to go up
 weight_down = -1        # penalty to go down
 weight_sharp_turn = 2   # penalty to take shape turn
@@ -115,7 +124,7 @@ for i in range(boundary[0, 0], boundary[1, 0], c_dis):
             newNode_index = [int((i - boundary[0, 0]) / c_dis),
                              int((j - boundary[0, 1]) / c_dis),
                              int((k - boundary[0, 2]) / c_dis)]
-            newNode_index_linear = cvt_coord(newNode_index, dimension)
+            newNode_index_linear = cvt_coord_to_line(newNode_index, dimension)
             distances[newNode_index_linear] = {}
             # print("New Node", newNode_index_linear)
 
@@ -136,7 +145,7 @@ for i in range(boundary[0, 0], boundary[1, 0], c_dis):
 
                                 # Calculate edge weight, right now only Euclidean distance
                                 weight = math.sqrt(pow(p, 2) + pow(q, 2) + pow(r, 2)) * c_dis
-                                nei_index_linear = cvt_coord(nei_index, dimension)
+                                nei_index_linear = cvt_coord_to_line(nei_index, dimension)
                                 distances[newNode_index_linear][nei_index_linear] = weight
                                 # print("neighbor", nei_index_linear, weight)
                                 # newNode.neighbor.append([nei_index_linear, weight])
@@ -148,29 +157,28 @@ print("node count", node_count)
 
 # Set start point, range: x:0~402, y:0~700, z:0~61
 sourceNode = None
-x, y, z = 0, 0, 0
 while sourceNode is None:
-    x = int(random.random() * len(nodes_list))
-    y = int(random.random() * len(nodes_list[0]))
-    z = int(random.random() * len(nodes_list[0][0]))
-    sourceNode = nodes_list[x][y][z]
-sourceIndex = cvt_coord([x, y, z], dimension)
+    sx = int(random.random() * len(nodes_list))
+    sy = int(random.random() * len(nodes_list[0]))
+    sz = int(random.random() * len(nodes_list[0][0]))
+    sourceNode = nodes_list[sx][sy][sz]
 endNode = None
 while endNode is None:
-    x = int(random.random() * len(nodes_list))
-    y = int(random.random() * len(nodes_list[0]))
-    z = int(random.random() * len(nodes_list[0][0]))
-    endNode = nodes_list[x][y][z]
-endIndex = cvt_coord([x, y, z], dimension)
+    ex = int(random.random() * len(nodes_list))
+    ey = int(random.random() * len(nodes_list[0]))
+    ez = int(random.random() * len(nodes_list[0][0]))
+    endNode = nodes_list[ex][ey][ez]
+endIndex = cvt_coord_to_line([ex, ey, ez], dimension)
+sourceIndex = cvt_coord_to_line([sx, sy, sz], dimension)
 
 # error record
 # success = [1581, 1493]
-sourceIndex = 1581
-endIndex = 1493
-print("sourceIndex", sourceIndex)
-print("endIndex", endIndex)
+# sourceIndex = 1581
+# endIndex = 1493
+print("sourceIndex", sx, sy, sz)
+print("endIndex", ex, ey, ez)
 
-currentIndex = sourceIndex
+currentIndex = cvt_coord_to_line([sx, sy, sz], dimension)
 currentWei = 0
 unvisited[currentIndex] = currentWei
 
