@@ -2,6 +2,8 @@ import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import interpolate
+from mpl_toolkits.mplot3d import Axes3D
 
 
 def cvt_coord_to_line(index_list, dimension):
@@ -40,13 +42,24 @@ for item in path:
     x.append(coord[0])
     y.append(coord[1])
     z.append(coord[2])
-print(x)
-print(y)
-print(z)
+# print(x)
+# print(y)
+# print(z)
 
-# plot in 3d space
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.plot(x, y, z)
+# plot straight line in 3d space
+# fig = plt.figure(2)
+# ax = fig.gca(projection='3d')
+# ax.plot(x, y, z)
+# plt.show()
+
+# spline interpolation
+tck, u = interpolate.splprep([x, y, z], s =2)
+x_knots, y_knots, z_knots = interpolate.splev(tck[0], tck)
+print(x_knots, y_knots, z_knots)
+
+fig2 = plt.figure(2)
+ax3d = fig2.add_subplot(111, projection='3d')
+ax3d.plot(x_knots, y_knots, z_knots, 'go')
+ax3d.plot(x, y, z, 'b')
+fig2.show()
 plt.show()
-

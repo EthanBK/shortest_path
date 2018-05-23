@@ -9,7 +9,7 @@ total_rad = 10
 z_factor = 3
 noise = 0.1
 
-num_true_pts = 200
+num_true_pts = 100
 s_true = np.linspace(0, total_rad, num_true_pts)
 x_true = np.cos(s_true)
 y_true = np.sin(s_true)
@@ -23,7 +23,7 @@ z_sample = s_sample/z_factor + noise * np.random.randn(num_sample_pts)
 
 tck, u = interpolate.splprep([x_sample,y_sample,z_sample], s=2)
 x_knots, y_knots, z_knots = interpolate.splev(tck[0], tck)
-u_fine = np.linspace(0,1,num_true_pts)
+u_fine = np.linspace(0, 1, num_true_pts)
 x_fine, y_fine, z_fine = interpolate.splev(u_fine, tck)
 
 fig2 = plt.figure(2)
