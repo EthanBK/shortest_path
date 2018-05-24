@@ -42,24 +42,20 @@ for item in path:
     x.append(coord[0])
     y.append(coord[1])
     z.append(coord[2])
-# print(x)
-# print(y)
-# print(z)
-
-# plot straight line in 3d space
-# fig = plt.figure(2)
-# ax = fig.gca(projection='3d')
-# ax.plot(x, y, z)
-# plt.show()
 
 # spline interpolation
-tck, u = interpolate.splprep([x, y, z], s =2)
+num_sample_pts = 100
+tck, u = interpolate.splprep([x, y, z], s=2)
 x_knots, y_knots, z_knots = interpolate.splev(tck[0], tck)
-print(x_knots, y_knots, z_knots)
+u_sample = np.linspace(0, 1, num_sample_pts)
+x_sp, y_sp, z_sp = interpolate.splev(u_sample, tck)
 
 fig2 = plt.figure(2)
 ax3d = fig2.add_subplot(111, projection='3d')
-ax3d.plot(x_knots, y_knots, z_knots, 'go')
-ax3d.plot(x, y, z, 'b')
+ax3d.plot(x_knots, y_knots, z_knots, 'go', label='knots')
+ax3d.plot(x_sp, y_sp, z_sp, 'g', label='B-spline')
+ax3d.plot(x, y, z, 'b', label='true')
+ax3d.legend()
 fig2.show()
 plt.show()
+fig2.savefig('spline.png')

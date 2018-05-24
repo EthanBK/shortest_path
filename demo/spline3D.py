@@ -28,9 +28,13 @@ x_fine, y_fine, z_fine = interpolate.splev(u_fine, tck)
 
 fig2 = plt.figure(2)
 ax3d = fig2.add_subplot(111, projection='3d')
-ax3d.plot(x_true, y_true, z_true, 'b')
-ax3d.plot(x_sample, y_sample, z_sample, 'r*')
+# x_true: cos sin
+ax3d.plot(x_true, y_true, z_true, 'b', label='true')
+# x_sample: true + noise
+ax3d.plot(x_sample, y_sample, z_sample, 'r*', label='noise')
+
 ax3d.plot(x_knots, y_knots, z_knots, 'go')
-ax3d.plot(x_fine, y_fine, z_fine, 'g')
+ax3d.plot(x_fine, y_fine, z_fine, 'g', label='fine')
+ax3d.legend()
 fig2.show()
 plt.show()
