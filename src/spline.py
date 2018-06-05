@@ -42,15 +42,6 @@ for item in path:
     x.append(coord[0])
     y.append(coord[1])
     z.append(coord[2])
-# print(x)
-# print(y)
-# print(z)
-
-# plot straight line in 3d space
-# fig = plt.figure(2)
-# ax = fig.gca(projection='3d')
-# ax.plot(x, y, z)
-# plt.show()
 
 # spline interpolation
 tck, u = interpolate.splprep([x, y, z], s =2)
