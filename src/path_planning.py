@@ -3,8 +3,8 @@ import numpy as np
 import scipy.spatial as spatial
 import math
 import random
-import dijkstra_path_planning
-import potential_field
+import dijkstra_path_planning as dpp
+import potential_field_path_planning as pfpp
 import sys
 
 
@@ -103,13 +103,11 @@ def main():
     print("Get Start and End Finish!", start_end)
 
     # Implement Dijkstra's Algorithm to find shortest path
-    index, from_node = dijkstra_path_planning.dijk(dimension, boundary, point_tree, nodes_list, start_end)
+    # index, from_node = dpp.dijk(dimension, boundary, point_tree, nodes_list, start_end)
+    # print_path(index, from_node)
 
     # Implement Potential Field Path Planning
-
-
-    print_path(index, from_node)
-    sys.exit("Path found!")
+    pfpp.main(nodes_list, dimension, boundary, start_end, point_tree, c_dis)
 
 
 if __name__ == '__main__':
