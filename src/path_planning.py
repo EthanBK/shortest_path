@@ -104,19 +104,22 @@ def main():
     print("dimension:\n", dimension)
 
     # Get start and end points
+    print("Generating Start and End points...")
     start_end = get_start_end(dimension, create_new_start)
-    print("Get Start and End Finish!", start_end)
+    print("Complete!", start_end)
 
     # Implement Dijkstra's Algorithm to find shortest path
-    end_index_dpp, from_node_dpp = dpp.dijk(dimension, boundary, point_tree, nodes_list, start_end)
+    end_index_dpp, from_node_dpp, path_length = dpp.dijk(dimension, boundary, point_tree, nodes_list, start_end)
     print("Path Found by Dijkstra's Shortest Path:")
     print_path(end_index_dpp, from_node_dpp, "dpp")
+    print("Path Length: ", path_length)
 
     # Implement Potential Field Path Planning
     pfpp = PFPP()
-    end_index_pfpp, from_node_pfpp = pfpp.main(nodes_list, dimension, boundary, start_end, point_tree, c_dis)
+    end_index_pfpp, from_node_pfpp, path_length = pfpp.main(nodes_list, dimension, boundary, start_end, point_tree, c_dis)
     print("Path Found by Potential Field PP:")
     print_path(end_index_pfpp, from_node_pfpp, "pfpp")
+    print("Path Length: ", path_length)
 
 
 if __name__ == '__main__':

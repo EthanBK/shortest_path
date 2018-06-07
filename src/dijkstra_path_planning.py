@@ -123,6 +123,7 @@ def build_grpah(boundary, dimension, nodes_list, point_tree):
 
 
 def dijk(dimension, boundary, point_tree, nodes_list, start_end):
+    print("Start Dijkstra's Shortest Path...")
     distances, visited, unvisited, from_node = build_grpah(boundary, dimension, nodes_list, point_tree)
 
     source_index, end_index = start_end
@@ -141,8 +142,8 @@ def dijk(dimension, boundary, point_tree, nodes_list, start_end):
                 from_node[neighbor] = current_index
         visited[current_index] = current_wei
         if current_index == end_index:
-            print("Short Path Distance from Start to End is: ", current_wei)
-            return current_index, from_node
+            print("Path Distance from Start to End: ", current_wei)
+            return current_index, from_node, current_wei
 
             # print_path(current_index, from_node)
 
@@ -154,7 +155,7 @@ def dijk(dimension, boundary, point_tree, nodes_list, start_end):
         if not candidates:
             sys.exit("No Path!")
         current_index, current_wei = sorted(candidates, key=lambda x: x[1])[0]
-    return end_index, from_node
+    return end_index, from_node, current_wei
     # print(visited[end_index])
 
 

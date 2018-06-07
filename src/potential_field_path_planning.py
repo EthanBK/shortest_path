@@ -7,6 +7,7 @@ class PFPP:
     # Define parameters
     KP = 5.0        # Attractive potential gain
     ETA = 100.0     # repulsive potential gain
+    GE = 10         # Gravity coefficient
     start_index = 0
     end_index = 0
     nodes_list = []
@@ -79,6 +80,7 @@ class PFPP:
         visited = np.empty(self.dimension, dtype=bool)
         dis_map = self.get_near_dis_map()
         potential_map = self.calculate_potential_field_map(dis_map)
+        path_len = 0
 
         gx, gy, gz = self.cvt_coord_to_cube(self.end_index)
         cx, cy, cz = self.cvt_coord_to_cube(self.start_index)
@@ -114,15 +116,17 @@ class PFPP:
             if min_po == cur_po:
                 print("Trapped in Local Minimum / No Path!")
                 break
+            dist = math.sqrt((nx - cx) ** 2 + (ny - cy) ** 2 + (nz - cz) ** 2)
+            path_len += dist
             from_node[self.cvt_coord_to_line([nx, ny, nz])] = self.cvt_coord_to_line([cx, cy, cz])
             cx = nx
             cy = ny
             cz = nz
         last_node = self.cvt_coord_to_line([cx, cy, cz])
-        return last_node, from_node
+        return last_node, from_node, path_len * self.c_dist
 
     def main(self, nodes_list, dimension, boundary, start_end, point_tree, c_dis):
-        print("Start Potential Field Path Planning")
+        print("Start Potential Field Path Planning...")
         self.nodes_list = nodes_list
         self.dimension = dimension
         self.boundary = boundary
@@ -130,6 +134,5 @@ class PFPP:
         self.c_dist = c_dis
         # read start and end point
         self.start_index, self.end_index = start_end
-        from_node = self.potential_field_planning()
-        return from_node
+        return self.potential_field_planning()
 
