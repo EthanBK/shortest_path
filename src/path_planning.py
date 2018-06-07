@@ -33,16 +33,16 @@ def build_grid(parameter):
     c_dis, weight_up, weight_down, weight_turn = parameter
 
     # read las data
-    inFile = File('../filtered_points/filtered_points_0.5.las', mode='r')
-    points = np.transpose(np.array([inFile.x, inFile.y, inFile.z]))
+    in_file = File('../filtered_points/filtered_points_0.5.las', mode='r')
+    points = np.transpose(np.array([in_file.x, in_file.y, in_file.z]))
 
     # Build KDTree
     point_tree = spatial.KDTree(points)
 
     # find the boundary of the site;
     boundary = np.array(
-        [[math.ceil(inFile.header.min[0]), math.ceil(inFile.header.min[1]), math.ceil(inFile.header.min[2])],
-         [math.floor(inFile.header.max[0]), math.floor(inFile.header.max[1]), math.floor(inFile.header.max[2])]])
+        [[math.ceil(in_file.header.min[0]), math.ceil(in_file.header.min[1]), math.ceil(in_file.header.min[2])],
+         [math.floor(in_file.header.max[0]), math.floor(in_file.header.max[1]), math.floor(in_file.header.max[2])]])
 
     # create a List to store nodes
     nodes_list = [[[None for i in range(boundary[0, 2], boundary[1, 2], c_dis)]

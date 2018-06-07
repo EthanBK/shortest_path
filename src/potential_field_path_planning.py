@@ -12,7 +12,8 @@ class PFPP:
     dimension = []
     boundary = []
     point_tree = None
-    c_dist = 0
+    c_dist = 0      # Density of grid
+    safe_dist = 5   # closest distance to obstacle
 
     def cvt_coord_to_cube(self, index):
         res = []
@@ -24,14 +25,27 @@ class PFPP:
         res.reverse()
         return res
 
+    def cvt_coord_to_line(self, index_cub):
+        res = index_cub[0]
+        res += index_cub[1] * self.dimension[0]
+        res += index_cub[2] * self.dimension[0] * self.dimension[1]
+        return res
+
     def cal_attractive_potential(self, x_ind, y_ind, z_ind):
-        gx, gy, gz = self.cvt_coord_to_cube(self.end_index, self.dimension)
+        gx, gy, gz = self.cvt_coord_to_cube(self.end_index)
         dist_to_end = self.c_dist * math.sqrt((x_ind - gx) ** 2 + (y_ind - gy) ** 2 + (z_ind - gz) ** 2)
         return 0.5 * self.KP * dist_to_end
 
     def cal_repulsive_potential(self, x_ind, y_ind, z_ind, dis_map):
-        re_po = 0
-
+        # get distance to the nearest obstacle
+        dist_to_obstacle = dis_map[x_ind][y_ind][z_ind]
+        # calculate repulsive potential
+        if dist_to_obstacle <= self.safe_dist:
+            if dist_to_obstacle < 0.1:
+                dist_to_obstacle = 0.1
+            re_po = 0.5 * self.ETA * (1.0 / dist_to_obstacle - 1.0 / self.safe_dist) ** 2
+        else:
+            re_po = 0
         return re_po
 
     # calculate the potential map
@@ -64,6 +78,25 @@ class PFPP:
         dis_map = self.get_near_dis_map()
         potential_map = self.calculate_potential_field_map(dis_map)
         # todo: find path based on potential_map, store the path in from_node
+        gx, gy, gz = self.cvt_coord_to_cube(self.end_index)
+        cx, cy, cz = self.cvt_coord_to_cube(self.start_index)
+        dist_to_end = self.c_dist * math.sqrt((cx - gx) ** 2 + (cy - gy) ** 2 + (cz - gz) ** 2)
+        next_step = [[-1, 0, 1],
+                     [-1, 0, 1],
+                     [-1, 0, 1]]
+
+        while dist_to_end < self.c_dist:
+            mind = float("inf")
+            for i in range(-1, 2, 1):
+                for j in range(-1, 2, 1):
+                    for k in range(-1, 2, 1):
+                        nei_x, nei_y, nei_z = [cx + i, cy + j, cz + k]
+                        if nei_x < 0 or nei_x > self.dimension[0] or \
+                           nei_y < 0 or nei_y > self.dimension[1] or \
+                           nei_z < 0 or nei_z > self.dimension[2]:
+                            continue
+
+
         return from_node
 
     def main(self, nodes_list, dimension, boundary, start_end, point_tree, c_dis):
