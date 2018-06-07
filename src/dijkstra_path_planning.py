@@ -25,19 +25,6 @@ def cvt_coord_to_cube(index, dimension):
     return res
 
 
-def print_path(end_index, from_node):
-    prev = end_index
-    path = []
-    while prev is not None:
-        path.append(prev)
-        prev = from_node[prev]
-    path.reverse()
-    print("path index: ", path)
-    with open('../data/path.txt', 'w') as fp:
-        for item in path:
-            fp.write("%s," % item)
-
-
 class Node:
     def __init__(self, x, y, z):
         self.x = x
@@ -167,7 +154,6 @@ def dijk(dimension, boundary, point_tree, nodes_list, start_end):
         if not candidates:
             sys.exit("No Path!")
         current_index, current_wei = sorted(candidates, key=lambda x: x[1])[0]
-
     return end_index, from_node
     # print(visited[end_index])
 

@@ -4,11 +4,11 @@ import scipy.spatial as spatial
 import math
 import random
 import dijkstra_path_planning as dpp
-import potential_field_path_planning as pfpp
+from potential_field_path_planning import PFPP
 import sys
 
 
-def print_path(end_index, from_node):
+def print_path(end_index, from_node, method):
     prev = end_index
     path = []
     while prev is not None:
@@ -16,9 +16,14 @@ def print_path(end_index, from_node):
         prev = from_node[prev]
     path.reverse()
     print("path index: ", path)
-    with open('../data/path.txt', 'w') as fp:
-        for item in path:
-            fp.write("%s," % item)
+    if method == "dpp":
+        with open('../data/path_dpp.txt', 'w') as fp:
+            for item in path:
+                fp.write("%s," % item)
+    if method == "pfpp":
+        with open('../data/path_pfpp.txt', 'w') as fp:
+            for item in path:
+                fp.write("%s," % item)
 
 
 def cvt_coord_to_line(index_list, dimension):
@@ -95,19 +100,23 @@ def main():
     # Build Grid in the space
     nodes_list, dimension, boundary, point_tree = build_grid(parameter)
     print("Build Grid Finish!")
-    print("dimension: ", dimension)
-    print("boundary: ", boundary)
+    print("boundary:\n", boundary)
+    print("dimension:\n", dimension)
 
     # Get start and end points
     start_end = get_start_end(dimension, create_new_start)
     print("Get Start and End Finish!", start_end)
 
     # Implement Dijkstra's Algorithm to find shortest path
-    # index, from_node = dpp.dijk(dimension, boundary, point_tree, nodes_list, start_end)
-    # print_path(index, from_node)
+    end_index_dpp, from_node_dpp = dpp.dijk(dimension, boundary, point_tree, nodes_list, start_end)
+    print("Path Found by Dijkstra's Shortest Path:")
+    print_path(end_index_dpp, from_node_dpp, "dpp")
 
     # Implement Potential Field Path Planning
-    pfpp.main(nodes_list, dimension, boundary, start_end, point_tree, c_dis)
+    pfpp = PFPP()
+    end_index_pfpp, from_node_pfpp = pfpp.main(nodes_list, dimension, boundary, start_end, point_tree, c_dis)
+    print("Path Found by Potential Field PP:")
+    print_path(end_index_pfpp, from_node_pfpp, "pfpp")
 
 
 if __name__ == '__main__':
